@@ -28,9 +28,13 @@ namespace Play.Catalog.Service.Controllers
 
         //GET /items/{id}
         [HttpGet("{id}")]
-        public ItemDto GetById(Guid id)
+        public ActionResult<ItemDto> GetById(Guid id)
         {
             var item = items.FirstOrDefault(x=>x.Id == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
             return item;
         }
 
@@ -47,9 +51,14 @@ namespace Play.Catalog.Service.Controllers
 
         //PUT /items/{id}
         [HttpPut]
-        public ActionResult Post(Guid id, UpdateItemDto updateItemDto)
+        public ActionResult Put(Guid id, UpdateItemDto updateItemDto)
         {
             var existingItem = items.FirstOrDefault(x => x.Id == id);
+
+            if (existingItem == null)
+            {
+                return NotFound();
+            }
 
             var updatedItem = existingItem with
             {
@@ -66,9 +75,13 @@ namespace Play.Catalog.Service.Controllers
 
         //DELETE /items/{id}
         [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
+        public ActionResult Delete(Guid id)
         {
             var index = items.FindIndex(item => item.Id == id);
+            if (index < 0)
+            {
+                return NotFound();
+            }
             items.RemoveAt(index);
 
             return NoContent();
