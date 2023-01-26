@@ -3,16 +3,14 @@ using Play.Catalog.Service.Entities;
 
 namespace Play.Catalog.Service.Repository
 {
-    public class ItemsRepository
+    public class ItemsRepository : IItemsRepository
     {
         private const string collectionName = "items";
         private readonly IMongoCollection<Item> dbCollection;
         private readonly FilterDefinitionBuilder<Item> filterBuilder = Builders<Item>.Filter;
 
-        public ItemsRepository()
-        {
-            var mangoClient = new MongoClient("mongodb://localhost:27017");
-            var database = mangoClient.GetDatabase("Catalog");
+        public ItemsRepository(IMongoDatabase database)
+        {    
             dbCollection = database.GetCollection<Item>(collectionName);
         }
 
@@ -33,7 +31,7 @@ namespace Play.Catalog.Service.Repository
             {
                 throw new ArgumentNullException(nameof(entity));
             }
-            await dbCollection.InsertOneAsync(entity);           
+            await dbCollection.InsertOneAsync(entity);
         }
 
         public async Task UpdateAsync(Item entity)
@@ -50,7 +48,7 @@ namespace Play.Catalog.Service.Repository
 
         public async Task RemoveAsync(Guid id)
         {
-            FilterDefinition<Item> filter = filterBuilder.Eq(entity => entity.Id, id);   
+            FilterDefinition<Item> filter = filterBuilder.Eq(entity => entity.Id, id);
             await dbCollection.DeleteOneAsync(filter);
         }
 
