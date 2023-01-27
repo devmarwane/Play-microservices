@@ -1,6 +1,7 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using Play.Catalog.Service.Entities;
 using Play.Catalog.Service.Repository;
 using Play.Catalog.Service.Settings;
 
@@ -29,7 +30,15 @@ builder.Services.AddSingleton(serviceProvider =>
     return mongoClient.GetDatabase(serviceSettings.ServiceName);
 });
 //register repositories
-builder.Services.AddSingleton<IItemsRepository, ItemsRepository>();
+
+//we use service provider because we need to specify a parameter as an input to the repository
+//(in MongoRepository we're receiving our collection name, so we cannot just expect to all parameters to be injected automatically by the service container for us)
+builder.Services.AddSingleton<IRepository<Item>>(serviceProvider =>
+{
+    //before we can create an instance of the MongoRepository first, we need an instance of the IMongoDatabase
+    var database = serviceProvider.GetService<IMongoDatabase>();
+    return new MongoRepository<Item>(database, "items");
+});
 
 
 //To Store guid type in mongo db as string
