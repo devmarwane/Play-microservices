@@ -8,3 +8,8 @@ dotnet pack -p:PackageVersion=1.0.1 -o ..\..\..\..\packages
 add a nuget source:
 dotnet nuget add source C:\dev\Microservices\Play-microservices\packages -n PlayEconomy
 
+install a package:
+dotnet add package Play.Catalog.Contracts
+
+run project:
+dotnet run
