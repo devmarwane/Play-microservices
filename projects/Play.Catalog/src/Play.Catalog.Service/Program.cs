@@ -24,14 +24,30 @@ builder.Services.AddMongo()
     .AddMassTrannsitWithRabbitMq();
 
 
+
 var app = builder.Build();
 
+
+
 // Configure the HTTP request pipeline.
+
+string AllowedOriginSetting = "AllowedOrigin";
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+   
+    app.UseCors(Corsbuilder =>
+    {
+        Corsbuilder.WithOrigins(builder.Configuration[AllowedOriginSetting])
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 }
+
+
+
 
 app.UseHttpsRedirection();
 
