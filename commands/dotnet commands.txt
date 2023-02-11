@@ -13,3 +13,15 @@ dotnet add package Play.Catalog.Contracts
 
 run project:
 dotnet run
+
+
+#identity UI
+.install asp net code generator:
+dotnet tool install -g dotnet-aspnet-codegenerator --version 7.0.0
+.then install the followings packages:
+- Microsoft.VisualStudio.Web.CodeGeneration.Design package 
+- Microsoft.AspNetCore.Identity.UI
+- Microsoft.EntityFrameworkCore.Design
+- Microsoft.EntityFrameworkCore.SqlServer
+.use code generator to generate the identity files that we need
+dotnet aspnet-codegenerator identity --files "Account.Register"
