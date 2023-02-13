@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Play.Catalog.Service.Entities;
 using Play.Common.MassTransit;
 using Play.Common.MongoDB;
@@ -23,7 +24,12 @@ builder.Services.AddMongo()
     ////register & configure mass transit
     .AddMassTrannsitWithRabbitMq();
 
-
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://localhost:5003";
+        options.Audience = serviceSettings.ServiceName;
+    });
 
 var app = builder.Build();
 
@@ -50,6 +56,8 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
