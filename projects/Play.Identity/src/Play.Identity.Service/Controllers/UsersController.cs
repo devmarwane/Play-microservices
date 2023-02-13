@@ -1,14 +1,17 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Play.Identity.Service.Dtos;
 using Play.Identity.Service.Entities;
 using Play.Identity.Service.Extensions;
+using static Duende.IdentityServer.IdentityServerConstants;
 
 namespace Play.Identity.Service.Controllers
 {
     [Route("users")]
     [ApiController]
+    [Authorize(Policy = LocalApi.PolicyName)]
     public class UsersController : ControllerBase
     {
         private readonly SignInManager<ApplicationUser> _signInManager;

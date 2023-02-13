@@ -39,6 +39,8 @@ builder.Services.AddIdentityServer(options =>
     .AddDeveloperSigningCredential();
 
 
+builder.Services.AddLocalApiAuthentication();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
