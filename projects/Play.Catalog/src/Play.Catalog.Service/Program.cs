@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Play.Catalog.Service;
 using Play.Catalog.Service.Entities;
 using Play.Common.Identity;
 using Play.Common.MassTransit;
@@ -26,6 +27,20 @@ builder.Services.AddMongo()
     .AddMassTrannsitWithRabbitMq()
     .AddJwtBearerAuthentication();
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(Policies.Read, policy =>
+    {
+        policy.RequireRole("Admin");
+        policy.RequireClaim("scope", "catalog.readaccess", "catalog.fullaccess");
+    });
+
+    options.AddPolicy(Policies.Write, policy =>
+    {
+        policy.RequireRole("Admin");
+        policy.RequireClaim("scope", "catalog.writeaccess", "catalog.fullaccess");
+    });
+});
 var app = builder.Build();
 
 
