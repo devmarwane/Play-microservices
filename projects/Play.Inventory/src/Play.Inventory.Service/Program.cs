@@ -1,8 +1,10 @@
+using GreenPipes;
 using Play.Common.Identity;
 using Play.Common.MassTransit;
 using Play.Common.MongoDB;
 using Play.Inventory.Service.Clients;
 using Play.Inventory.Service.Entities;
+using Play.Inventory.Service.Exceptions;
 using Polly;
 using Polly.Timeout;
 
@@ -24,7 +26,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddMongo()
     .AddMongoRepository<InventoryItem>(collectionName: "inventoryitems")
     .AddMongoRepository<CatalogItem>(collectionName: "catalogitems")
-    .AddMassTrannsitWithRabbitMq()
+    .AddMassTrannsitWithRabbitMq(retryConfigurator =>
+    {
+        retryConfigurator.Interval(3, TimeSpan.FromSeconds(5));
+        retryConfigurator.Ignore(typeof(UnknownItemException));
+    })
     .AddJwtBearerAuthentication();
 
 
