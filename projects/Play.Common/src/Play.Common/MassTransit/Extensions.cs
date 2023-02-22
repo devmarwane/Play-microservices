@@ -24,7 +24,7 @@ namespace Play.Common.MassTransit
         {
             services.AddMassTransit(configure =>
             {
-                //consumers registration
+                //consumes registration
                 //consumers are the classes that are charges of consuming messages from the RabbitMQ messages
                 //we gonna register consumers by define the assembly that should have all the consumers already defined, and that's going to be the entry assemby for wichever microservice is invoking this class
                 configure.AddConsumers(Assembly.GetEntryAssembly());
