@@ -5,16 +5,19 @@ using Play.Inventory.Service.Clients;
 using Play.Inventory.Service.Dtos;
 using Play.Inventory.Service.Entities;
 using Play.Inventory.Service.Extensions;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Play.Inventory.Service.Controllers
 {
     [ApiController]
     [Route("items")]
-    [Authorize]
     public class ItemsController : ControllerBase
     {
         private readonly IRepository<InventoryItem> itemsRepository;
         private readonly IRepository<CatalogItem> catalogItemsRepository;
+
+        private const string AdminRole = "Admin";
 
         public ItemsController(IRepository<InventoryItem> itemsRepository, IRepository<CatalogItem> catalogItemsRepository)
         {
@@ -23,11 +26,23 @@ namespace Play.Inventory.Service.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<InventoryItemDto>>> GetAsync(Guid userId)
         {
+
             if (userId == Guid.Empty)
             {
                 return BadRequest();
+            }
+
+            var currentUserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+
+            if (Guid.Parse(currentUserId) != userId)
+            {
+                if (!User.IsInRole(AdminRole))
+                {
+                    return Forbid();
+                }
             }
 
             var inventoryItemEntities = await itemsRepository.GetAllAsync(item => item.UserId == userId);
@@ -44,6 +59,7 @@ namespace Play.Inventory.Service.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = AdminRole)]
         public async Task<ActionResult> PostAsync(GrantItemsDto grantItemsDto)
         {
             var inventoryItem = await itemsRepository.GetAsync(
