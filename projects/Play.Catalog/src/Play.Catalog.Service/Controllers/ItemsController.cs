@@ -20,7 +20,7 @@ namespace Play.Catalog.Service.Controllers
         private const string AdminRole = "Admin";
 
         private readonly IRepository<Item> itemsRepository;
-        private readonly IPublishEndpoint publishEndpoint; 
+        private readonly IPublishEndpoint publishEndpoint;
 
         public ItemsController(IRepository<Item> itemsRepository, IPublishEndpoint publishEndpoint)
         {
@@ -32,7 +32,7 @@ namespace Play.Catalog.Service.Controllers
         [HttpGet]
         [Authorize(Policies.Read)]
         public async Task<ActionResult<IEnumerable<ItemDto>>> GetAsync()
-        {   
+        {
             var items = (await itemsRepository.GetAllAsync())
                         .Select(item => item.AsDto());
             return Ok(items);
@@ -68,7 +68,13 @@ namespace Play.Catalog.Service.Controllers
 
             await itemsRepository.CreateAsync(item);
 
-            await publishEndpoint.Publish(new CatalogItemCreated(item.Id, item.Name, item.Description));
+            await publishEndpoint.Publish(
+                new CatalogItemCreated(
+                    item.Id, 
+                    item.Name, 
+                    item.Description, 
+                    item.Price
+                    ));
 
             return CreatedAtAction(nameof(GetByIdAsync), new { id = item.Id }, item);
         }
@@ -91,7 +97,13 @@ namespace Play.Catalog.Service.Controllers
 
             await itemsRepository.UpdateAsync(existingItem);
 
-            await publishEndpoint.Publish(new CatalogItemUpdated(existingItem.Id, existingItem.Name, existingItem.Description));
+            await publishEndpoint.Publish(
+                new CatalogItemUpdated(
+                    existingItem.Id,
+                    existingItem.Name,
+                    existingItem.Description, 
+                    existingItem.Price
+                    ));
 
             return NoContent();
         }
