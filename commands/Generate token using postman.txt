@@ -1,0 +1,8 @@
+Generate token using postman
+Authorization OAuth2
+Grant Type: Authorization Code (With PKCE)
+Callback URL: urn:ietf:wg:oauth:2.0:oob
+Auth URL: https://localhost:5003/connect/authorize
+Access Token URL: https://localhost:5003/connect/token
+Client ID: postman
+Scope: openid
