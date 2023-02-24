@@ -6,4 +6,6 @@
         int Quantity,
         Guid CorrelationId
         );
+
+    public record GetPurchaseState(Guid CorrelationId);
 }
