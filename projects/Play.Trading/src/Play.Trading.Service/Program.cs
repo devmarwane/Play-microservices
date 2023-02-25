@@ -4,7 +4,9 @@ using Play.Common.Identity;
 using Play.Common.MassTransit;
 using Play.Common.MongoDB;
 using Play.Common.Settings;
+using Play.Trading.Service.Entities;
 using Play.Trading.Service.StateMachines;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddMongo()
+    .AddMongoRepository<CatalogItem>("catalogitems")
     .AddJwtBearerAuthentication();
 
 AddMassTransit(builder.Services);
@@ -49,6 +52,7 @@ void AddMassTransit(IServiceCollection services)
     services.AddMassTransit(configure =>
     {
         configure.UsingPlayEconomyRabbitMQ();
+        configure.AddConsumers(Assembly.GetEntryAssembly());
         configure.AddSagaStateMachine<PurchaseStateMachine, PurchaseState>()
             .MongoDbRepository(r =>
             {
