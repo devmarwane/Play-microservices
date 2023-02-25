@@ -61,9 +61,10 @@ namespace Play.Trading.Service.Controllers
 
             await _publishEndpoint.Publish<PurchaseRequested>(message);
 
-            return AcceptedAtAction(nameof(GetStatusAsync),new { correlationId });
+            return AcceptedAtAction(nameof(GetStatusAsync), new { correlationId }, new { correlationId });
+
         }
 
-    
+
     }
 }
