@@ -24,7 +24,7 @@ namespace Play.Identity.Service.Consumers
                 throw new UnknownUserException(message.UserId);
             }
 
-            user.Gil = message.Gil;
+            user.Gil -= message.Gil;
             if (user.Gil < 0)
             {
                 throw new UnsufficientFundsException(message.UserId, message.Gil);
