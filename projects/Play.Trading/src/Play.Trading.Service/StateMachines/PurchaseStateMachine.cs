@@ -1,4 +1,5 @@
 ﻿using Automatonymous;
+using Play.Identity.Contracts;
 using Play.Inventory.Contracts;
 using Play.Trading.Service.Activiies;
 
@@ -14,6 +15,7 @@ namespace Play.Trading.Service.StateMachines
         public Event<PurchaseRequested> PurchaseRequested { get; }
         public Event<GetPurchaseState> GetPurchaseState { get; }
         public Event<InventoryItemsGranted> InventoryItemsGranted { get; }
+        public Event<GilDebited> GilDebited { get; }
 
         public PurchaseStateMachine()
         {
@@ -22,6 +24,7 @@ namespace Play.Trading.Service.StateMachines
             ConfigureInitialState();
             ConfigureAny();
             ConfigureAccepted();
+            ConfigureItemsGranted();
         }
 
         private void ConfigureEvents()
@@ -29,6 +32,7 @@ namespace Play.Trading.Service.StateMachines
             Event(() => PurchaseRequested);
             Event(() => GetPurchaseState);
             Event(() => InventoryItemsGranted);
+            Event(() => GilDebited);
         }
 
         private void ConfigureInitialState()
@@ -71,7 +75,23 @@ namespace Play.Trading.Service.StateMachines
                         context.Instance.LastUpdated = DateTimeOffset.UtcNow;
 
                     })
+                    .Send(context => new DebitGil(
+                        UserId: context.Instance.UserId,
+                        Gil: context.Instance.PuschaseTotal.Value,
+                        CorrelationId: context.Instance.CorrelationId))
                     .TransitionTo(ItemsGranted));
+        }
+
+        private void ConfigureItemsGranted()
+        {
+            During(ItemsGranted,
+                When(GilDebited)
+                    .Then(context =>
+                    {
+                        context.Instance.LastUpdated = DateTimeOffset.UtcNow;
+                    })
+                    .TransitionTo(Completed)
+                );
         }
 
         private void ConfigureAny()

@@ -5,6 +5,7 @@ using Play.Common.Identity;
 using Play.Common.MassTransit;
 using Play.Common.MongoDB;
 using Play.Common.Settings;
+using Play.Identity.Contracts;
 using Play.Inventory.Contracts;
 using Play.Trading.Service.Entities;
 using Play.Trading.Service.Exceptions;
@@ -81,6 +82,7 @@ void AddMassTransit(IServiceCollection services)
                         .Get<QueueSettings>();
 
     EndpointConvention.Map<GrantItems>(new Uri(queueSettings.GrantItemsQueueAddress));
+    EndpointConvention.Map<DebitGil>(new Uri(queueSettings.DebitGilQueueAddress));
 
     services.AddMassTransitHostedService();
     services.AddGenericRequestClient();
