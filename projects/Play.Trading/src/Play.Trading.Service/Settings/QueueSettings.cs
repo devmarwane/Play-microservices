@@ -4,6 +4,7 @@
     {
         public string? GrantItemsQueueAddress { get; init; }
         public string? DebitGilQueueAddress { get; init; }
+        public string? SubstractItemsQueueAddress { get; init; }
 
     }
 }
