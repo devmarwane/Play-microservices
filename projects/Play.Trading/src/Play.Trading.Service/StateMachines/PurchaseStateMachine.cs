@@ -1,4 +1,5 @@
 ﻿using Automatonymous;
+using Play.Inventory.Contracts;
 using Play.Trading.Service.Activiies;
 
 namespace Play.Trading.Service.StateMachines
@@ -12,6 +13,7 @@ namespace Play.Trading.Service.StateMachines
 
         public Event<PurchaseRequested> PurchaseRequested { get; }
         public Event<GetPurchaseState> GetPurchaseState { get; }
+        public Event<InventoryItemsGranted> InventoryItemsGranted { get; }
 
         public PurchaseStateMachine()
         {
@@ -19,12 +21,14 @@ namespace Play.Trading.Service.StateMachines
             ConfigureEvents();
             ConfigureInitialState();
             ConfigureAny();
+            ConfigureAccepted();
         }
 
         private void ConfigureEvents()
         {
             Event(() => PurchaseRequested);
             Event(() => GetPurchaseState);
+            Event(() => InventoryItemsGranted);
         }
 
         private void ConfigureInitialState()
@@ -40,6 +44,13 @@ namespace Play.Trading.Service.StateMachines
                         context.Instance.LastUpdated = context.Instance.Received;
                     })
                     .Activity(x => x.OfType<CalculatePurchaseTotalActivity>())
+                    .Send(context => new GrantItems
+                    (
+                        UserId: context.Instance.UserId,
+                        CatalogItemId: context.Instance.ItemId,
+                        Quantity: context.Instance.Quantity,
+                        CorrelationId: context.Instance.CorrelationId
+                    ))
                     .TransitionTo(Accepted)
                     .Catch<Exception>(ex => ex
                         .Then(context =>
@@ -51,11 +62,23 @@ namespace Play.Trading.Service.StateMachines
             );
         }
 
+        private void ConfigureAccepted()
+        {
+            During(Accepted,
+                When(InventoryItemsGranted)
+                    .Then(context =>
+                    {
+                        context.Instance.LastUpdated = DateTimeOffset.UtcNow;
+
+                    })
+                    .TransitionTo(ItemsGranted));
+        }
+
         private void ConfigureAny()
         {
             DuringAny(
                 When(GetPurchaseState)
-                    .Respond(x=>x.Instance)
+                    .Respond(x => x.Instance)
             );
         }
 
