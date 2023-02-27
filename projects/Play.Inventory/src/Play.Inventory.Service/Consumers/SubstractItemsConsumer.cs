@@ -32,9 +32,18 @@ namespace Play.Inventory.Service.Consumers
             var inventoryItem = await itemsRepository.GetAsync(
             item => item.UserId == message.UserId && item.CatalogItemId == message.CatalogItemId);
 
+         
             if (inventoryItem != null)
             {
+                if (inventoryItem.MessageIds.Contains(context.MessageId.Value))
+                {
+                    await context.Publish(new InventoryItemsSubstracted(message.CorrelationId));
+                    return;
+                }
+
                 inventoryItem.Quantity -= message.Quantity;
+                inventoryItem.MessageIds.Add(context.MessageId.Value);
+
                 await itemsRepository.UpdateAsync(inventoryItem);
             }
 
