@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Play.Identity.Contracts;
 using Play.Identity.Service.Dtos;
 using Play.Identity.Service.Entities;
 using Play.Identity.Service.Extensions;
@@ -16,10 +18,12 @@ namespace Play.Identity.Service.Controllers
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public UsersController(UserManager<ApplicationUser> userManager)
+        public UsersController(UserManager<ApplicationUser> userManager, IPublishEndpoint publishEndpoint)
         {
             _userManager = userManager;
+            _publishEndpoint = publishEndpoint;
         }
 
         [HttpGet]
@@ -64,6 +68,8 @@ namespace Play.Identity.Service.Controllers
 
             await _userManager.UpdateAsync(user);
 
+            await _publishEndpoint.Publish(new UserUpdated(user.Id, user.Email, user.Gil));
+
             return NoContent();
         }
 
@@ -79,6 +85,7 @@ namespace Play.Identity.Service.Controllers
             }
 
             await _userManager.DeleteAsync(user);
+            await _publishEndpoint.Publish(new UserUpdated(user.Id, user.Email, 0));
 
             return NoContent();
         }

@@ -12,4 +12,11 @@
         Guid CorrelationId
         );
 
+    public record UserUpdated
+        (
+        Guid UserId,
+        string Email,
+        decimal NewTotalGil
+        );
+
 }
