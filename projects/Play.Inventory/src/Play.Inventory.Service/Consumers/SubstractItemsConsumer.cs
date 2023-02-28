@@ -45,6 +45,12 @@ namespace Play.Inventory.Service.Consumers
                 inventoryItem.MessageIds.Add(context.MessageId.Value);
 
                 await itemsRepository.UpdateAsync(inventoryItem);
+
+                await context.Publish(new InventoryItemUpdated(
+                    inventoryItem.UserId,
+                    inventoryItem.CatalogItemId,
+                    inventoryItem.Quantity
+                    ));
             }
 
             await context.Publish(new InventoryItemsSubstracted(message.CorrelationId));
