@@ -25,3 +25,5 @@ dotnet tool install -g dotnet-aspnet-codegenerator --version 7.0.0
 - Microsoft.EntityFrameworkCore.SqlServer
 .use code generator to generate the identity files that we need
 dotnet aspnet-codegenerator identity --files "Account.Register"
+.generate logout:
+dotnet aspnet-codegenerator identity --files "Account.Logout"
