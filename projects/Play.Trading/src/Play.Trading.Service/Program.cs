@@ -1,6 +1,6 @@
 using GreenPipes;
 using MassTransit;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.SignalR;
 using Play.Common.Identity;
 using Play.Common.MassTransit;
 using Play.Common.MongoDB;
@@ -10,6 +10,7 @@ using Play.Inventory.Contracts;
 using Play.Trading.Service.Entities;
 using Play.Trading.Service.Exceptions;
 using Play.Trading.Service.Settings;
+using Play.Trading.Service.SignalR;
 using Play.Trading.Service.StateMachines;
 using System.Reflection;
 
@@ -26,6 +27,7 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddMongo()
     .AddMongoRepository<CatalogItem>("catalogitems")
     .AddMongoRepository<InventoryItem>("inventoryitems")
@@ -33,6 +35,12 @@ builder.Services.AddMongo()
     .AddJwtBearerAuthentication();
 
 AddMassTransit(builder.Services);
+
+
+builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>()
+    .AddSingleton<MessageHub>()
+    .AddSignalR();
+
 
 var app = builder.Build();
 string AllowedOriginSetting = "AllowedOrigin";
@@ -47,7 +55,8 @@ if (app.Environment.IsDevelopment())
     {
         Corsbuilder.WithOrigins(builder.Configuration[AllowedOriginSetting])
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 }
 
@@ -58,6 +67,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<MessageHub>("/messagehub");
 
 app.Run();
 
