@@ -22,7 +22,7 @@ namespace Play.Trading.Service.Controllers
             _purchaseClient = purchaseClient;
         }
 
-        [HttpGet("status/{correlationId}")]
+        [HttpGet("status/{IdempotencyId}")]
         public async Task<ActionResult<PurchaseDto>> GetStatusAsync(Guid IdempotencyId)
         {
             var response = await _purchaseClient.GetResponse<PurchaseState>(

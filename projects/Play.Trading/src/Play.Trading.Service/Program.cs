@@ -28,6 +28,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddMongo()
     .AddMongoRepository<CatalogItem>("catalogitems")
+    .AddMongoRepository<InventoryItem>("inventoryitems")
+    .AddMongoRepository<ApplicationUser>("users")
     .AddJwtBearerAuthentication();
 
 AddMassTransit(builder.Services);
