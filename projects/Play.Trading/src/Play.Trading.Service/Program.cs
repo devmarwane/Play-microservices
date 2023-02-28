@@ -35,12 +35,20 @@ builder.Services.AddMongo()
 AddMassTransit(builder.Services);
 
 var app = builder.Build();
+string AllowedOriginSetting = "AllowedOrigin";
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseCors(Corsbuilder =>
+    {
+        Corsbuilder.WithOrigins(builder.Configuration[AllowedOriginSetting])
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 }
 
 app.UseHttpsRedirection();
